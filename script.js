@@ -1,5 +1,5 @@
 // Define the target date (March 8, 2025)
-const targetDate = new Date('2025-03-08');
+const targetDate = new Date('2025-03-06');
 
 // Get the current date
 const currentDate = new Date();
@@ -11,59 +11,60 @@ if (currentDate < targetDate) {
 } else {
   // Display the puzzle page
   const currentDateElement = document.getElementById('current-date');
-  currentDateElement.textContent = `Today's Date: ${currentDate.toLocaleDateString()}`};
+  currentDateElement.textContent = `Today's Date: ${currentDate.toLocaleDateString()}`;
 
-// Display the current date
-//const currentDateElement = document.getElementById('current-date');
-//const currentDate = new Date().toLocaleDateString();
-currentDateElement.textContent = `Today's Date: ${currentDate}`;
 
-// Create the 15x15 grid (225 cells total)
-const grid = document.getElementById('puzzle-grid');
+  // Display the current date
+  //const currentDateElement = document.getElementById('current-date');
+  //const currentDate = new Date().toLocaleDateString();
+  currentDateElement.textContent = `Today's Date: ${currentDate}`;
 
-for (let i = 0; i < 15 * 15; i++) {
-  const cell = document.createElement('div');
-  cell.classList.add('grid-cell');
-  cell.dataset.cellId = i + 1; // Unique ID for each cell
-  cell.textContent = i + 1; // Display cell number
-  grid.appendChild(cell);
-}
+  // Create the 15x15 grid (225 cells total)
+  const grid = document.getElementById('puzzle-grid');
 
-// Add drag-and-drop functionality
-const pieces = document.querySelectorAll('.piece');
+  for (let i = 0; i < 15 * 15; i++) {
+    const cell = document.createElement('div');
+    cell.classList.add('grid-cell');
+    cell.dataset.cellId = i + 1; // Unique ID for each cell
+    cell.textContent = i + 1; // Display cell number
+    grid.appendChild(cell);
+  }
 
-// Add drag event listeners to pieces
-pieces.forEach(piece => {
-  piece.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', e.target.dataset.piece);
-  });
-});
+  // Add drag-and-drop functionality
+  const pieces = document.querySelectorAll('.piece');
 
-// Add drop event listeners to grid cells
-const gridCells = document.querySelectorAll('.grid-cell');
-gridCells.forEach(cell => {
-  cell.addEventListener('dragover', (e) => {
-    e.preventDefault(); // Allow dropping
+  // Add drag event listeners to pieces
+  pieces.forEach(piece => {
+    piece.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', e.target.dataset.piece);
+    });
   });
 
-  cell.addEventListener('drop', (e) => {
-    e.preventDefault();
-    const pieceId = e.dataTransfer.getData('text/plain');
-    const piece = document.querySelector(`[data-piece="${pieceId}"]`);
+  // Add drop event listeners to grid cells
+  const gridCells = document.querySelectorAll('.grid-cell');
+  gridCells.forEach(cell => {
+    cell.addEventListener('dragover', (e) => {
+      e.preventDefault(); // Allow dropping
+    });
 
-    // Remove the piece from its current position
-    piece.remove();
+    cell.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const pieceId = e.dataTransfer.getData('text/plain');
+      const piece = document.querySelector(`[data-piece="${pieceId}"]`);
 
-    // Append the piece to the cell and align it to the top-left corner
-    cell.appendChild(piece);
-    piece.style.position = 'absolute';
-    piece.style.top = '0';
-    piece.style.left = '0';
+      // Remove the piece from its current position
+      piece.remove();
+
+      // Append the piece to the cell and align it to the top-left corner
+      cell.appendChild(piece);
+      piece.style.position = 'absolute';
+      piece.style.top = '0';
+      piece.style.left = '0';
+    });
   });
-});
 
-// Define correct positions for the pieces
-const correctPositions = {
+  // Define correct positions for the pieces
+  const correctPositions = {
     1: 1,
     2: 2,
     3: 3,
@@ -289,67 +290,68 @@ const correctPositions = {
     223: 223,
     224: 224,
     225: 225*/
-};
+  };
 
-// Get the modal and close button
-const modal = document.getElementById('solved-modal');
-const closeButton = document.querySelector('.close');
+  // Get the modal and close button
+  const modal = document.getElementById('solved-modal');
+  const closeButton = document.querySelector('.close');
 
-// Function to show the modal
-function showModal() {
-  modal.style.display = 'block';
-}
-
-// Function to hide the modal
-function hideModal() {
-  modal.style.display = 'none';
-}
-
-// Close the modal when the close button is clicked
-closeButton.addEventListener('click', hideModal);
-
-// Close the modal when clicking outside the modal content
-window.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    hideModal();
+  // Function to show the modal
+  function showModal() {
+    modal.style.display = 'block';
   }
-});
 
-// Function to check if the puzzle is solved
-function checkPuzzle() {
-  let correct = true;
-  pieces.forEach(piece => {
-    const pieceId = piece.dataset.piece;
-    const cellId = piece.parentElement.dataset.cellId;
-    if (cellId != correctPositions[pieceId]) {
-      correct = false;
+  // Function to hide the modal
+  function hideModal() {
+    modal.style.display = 'none';
+  }
+
+  // Close the modal when the close button is clicked
+  closeButton.addEventListener('click', hideModal);
+
+  // Close the modal when clicking outside the modal content
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      hideModal();
     }
   });
-  if (correct) {
-    showModal(); // Show the custom modal with the image
-  } else {
-    alert("Keep trying! 🧩");
+
+  // Function to check if the puzzle is solved
+  function checkPuzzle() {
+    let correct = true;
+    pieces.forEach(piece => {
+      const pieceId = piece.dataset.piece;
+      const cellId = piece.parentElement.dataset.cellId;
+      if (cellId != correctPositions[pieceId]) {
+        correct = false;
+      }
+    });
+    if (correct) {
+      showModal(); // Show the custom modal with the image
+    } else {
+      alert("Keep trying! 🧩");
+    }
   }
+
+  // Add a button to check the puzzle
+  const checkButton = document.createElement('button');
+  checkButton.textContent = 'Check Puzzle';
+  checkButton.addEventListener('click', checkPuzzle);
+  document.body.appendChild(checkButton);
+
+  // Function to reset the puzzle
+  function resetPuzzle() {
+    pieces.forEach(piece => {
+      // Move the piece back to the puzzle pieces container
+      document.getElementById('puzzle-pieces').appendChild(piece);
+      // Reset the piece's position
+      piece.style.position = 'static';
+    });
+  }
+
+  // Add a button to reset the puzzle
+  const resetButton = document.createElement('button');
+  resetButton.textContent = 'Reset Puzzle';
+  resetButton.addEventListener('click', resetPuzzle);
+  document.body.appendChild(resetButton);
 }
-
-// Add a button to check the puzzle
-const checkButton = document.createElement('button');
-checkButton.textContent = 'Check Puzzle';
-checkButton.addEventListener('click', checkPuzzle);
-document.body.appendChild(checkButton);
-
-// Function to reset the puzzle
-function resetPuzzle() {
-  pieces.forEach(piece => {
-    // Move the piece back to the puzzle pieces container
-    document.getElementById('puzzle-pieces').appendChild(piece);
-    // Reset the piece's position
-    piece.style.position = 'static';
-  });
-}
-
-// Add a button to reset the puzzle
-const resetButton = document.createElement('button');
-resetButton.textContent = 'Reset Puzzle';
-resetButton.addEventListener('click', resetPuzzle);
-document.body.appendChild(resetButton);
