@@ -17,9 +17,9 @@ h1 {
 
 #puzzle-grid {
   display: grid;
-  grid-template-columns: repeat(15, 20px); /* 15 columns, each 20px wide */
-  grid-template-rows: repeat(15, 20px); /* 15 rows, each 20px tall */
-  gap: 1px; /* Space between cells */
+  grid-template-columns: repeat(15, 25px); /* 15 columns, each 20px wide */
+  grid-template-rows: repeat(15, 25px); /* 15 rows, each 20px tall */
+  gap: 10px; /* Space between cells */
   background-color: #ddd;
   border: 2px solid #000;
   margin: 0 auto;
@@ -41,8 +41,8 @@ h1 {
 }
 
 .piece {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   background-color: #ffcc00;
   cursor: grab;
   display: inline-block;
