@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taccuino Campagna D&D</title>
+<style>
+    body {
+        margin: 0;
+        font-family: 'Georgia', serif;
+        background: #f4f1e9;
+    }
+    nav {
+        background: #3e2723;
+        padding: 10px;
+        display: flex;
+        gap: 20px;
+    }
+    nav a {
+        color: #f4f1e9;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .page {
+        display: none;
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+        background: #fffef6;
+        border: 1px solid #d6d2c4;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        min-height: 80vh;
+    }
+    .active {
+        display: block;
+    }
+    .notebook {
+        position: relative;
+        padding: 40px;
+        border-left: 5px solid #c9b79c;
+        line-height: 1.7;
+        background-image: repeating-linear-gradient(#fffef6, #fffef6 28px, #eee8d8 30px);
+        font-size: 18px;
+    }
+    h1, h2, h3 {
+        font-family: 'Georgia', serif;
+    }
+    .note-entry {
+        border: 1px solid #bbb;
+        padding: 10px;
+        margin: 15px 0;
+        background: #fff;
+    }
+    .note-date {
+        font-size: 14px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+    img.note-img {
+        max-width: 200px;
+        display: block;
+        margin: 10px 0;
+    }
+    @media (max-width: 600px) {
+        body { font-size: 16px; }
+        .page { padding: 10px; }
+        .notebook { padding: 20px; font-size: 16px; }
+        img.note-img { max-width: 100%; }
+    }
+</style>
+</head>
+<body>
+
+<nav>
+    <a href="#" onclick="showPage('main')">Taccuino</a>
+    <a href="#" onclick="showPage('addNote')">Aggiungi Dettagli Campagna</a>
+    <a href="#" onclick="showPage('addNPC')">Aggiungi NPC</a>
+    <a href="#" onclick="showPage('pcList')">Personaggi Giocanti</a>
+</nav>
+
+<!-- MAIN PAGE -->
+<div id="main" class="page active">
+    <h1>Taccuino della Campagna</h1>
+    <div class="notebook" id="notesContainer"></div>
+    <div style="margin-top:20px; display:flex; justify-content:space-between;">
+        <button onclick="prevPage()">⬅ Pagina Precedente</button>
+        <button onclick="nextPage()">Pagina Successiva ➡</button>
+    </div>
+</div>
+
+<!-- ADD NOTE PAGE -->
+<div id="addNote" class="page">
+    <h2>Aggiungi Una Nuova Nota</h2>
+    <label>Data:</label><br>
+    <input type="date" id="noteDate"><br><br>
+
+    <label>Testo della Nota:</label><br>
+    <textarea id="noteText" rows="8" style="width:100%"></textarea><br><br>
+
+    <label>Immagine (opzionale):</label><br>
+    <input type="file" id="noteImage" accept="image/*"><br><br>
+
+    <button onclick="addNote()">Aggiungi Nota</button>
+</div>
+
+<!-- ADD NPC PAGE -->
+<div id="addNPC" class="page">
+    <h2>Aggiungi NPC</h2>
+    <label>Nome:</label><br>
+    <input type="text" id="npcName"><br><br>
+    <label>Descrizione:</label><br>
+    <textarea id="npcDesc" rows="6" style="width:100%"></textarea><br><br>
+    <button onclick="addNPC()">Aggiungi NPC</button>
+
+    <h3>Lista NPC</h3>
+    <div id="npcContainer"></div>
+</div>
+
+<!-- PC LIST PAGE -->
+<div id="pcList" class="page">
+    <h2>Personaggi Giocanti</h2>
+    <label>Nome PG:</label><br>
+    <input type="text" id="pcName"><br><br>
+    <label>Classe / Info:</label><br>
+    <textarea id="pcInfo" rows="6" style="width:100%"></textarea><br><br>
+    <button onclick="addPC()">Aggiungi PG</button>
+
+    <h3>Lista PG</h3>
+    <div id="pcContainer"></div>
+</div>
+
+<script>
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- NOTE LOGIC ---
+    let currentPage = 0;
+    const notesPerPage = 1;
+
+    function renderPages() {
+        const container = document.getElementById('notesContainer');
+        const notes = Array.from(container.querySelectorAll('.note-entry'));
+        notes.forEach((n, i) => n.style.display = (Math.floor(i / notesPerPage) === currentPage) ? 'block' : 'none');
+    }
+
+    function nextPage() { currentPage++; renderPages(); }
+    function prevPage() { if (currentPage > 0) currentPage--; renderPages(); }
+
+    function addNote() {
+        const date = document.getElementById('noteDate').value;
+        const text = document.getElementById('noteText').value;
+        const imageFile = document.getElementById('noteImage').files[0];
+
+        if (!text.trim()) return;
+
+        const entry = document.createElement('div');
+        entry.className = 'note-entry';
+
+        if (date) {
+            const d = document.createElement('div');
+            d.className = 'note-date';
+            d.innerText = date;
+            entry.appendChild(d);
+        }
+
+        const t = document.createElement('div');
+        t.innerText = text;
+        entry.appendChild(t);
+
+        if (imageFile) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'note-img';
+                entry.appendChild(img);
+                renderPages();
+            };
+            reader.readAsDataURL(imageFile);
+        }
+
+        const del = document.createElement('button');
+        del.innerText = 'Elimina Nota';
+        del.onclick = () => { entry.remove(); renderPages(); };
+        entry.appendChild(del);
+
+        document.getElementById('notesContainer').appendChild(entry);
+
+        document.getElementById('noteText').value = '';
+        document.getElementById('noteDate').value = '';
+        document.getElementById('noteImage').value = '';
+
+        renderPages();
+    }
+
+    function addNPC() {
+        const name = document.getElementById('npcName').value.trim();
+        const desc = document.getElementById('npcDesc').value.trim();
+        if (!name) return;
+
+        const box = document.createElement('div');
+        box.className = 'note-entry';
+        box.innerHTML = `<h3>${name}</h3><p>${desc}</p>`;
+
+        document.getElementById('npcContainer').appendChild(box);
+
+        document.getElementById('npcName').value = '';
+        document.getElementById('npcDesc').value = '';
+    }
+
+    function addPC() {
+        const name = document.getElementById('pcName').value.trim();
+        const info = document.getElementById('pcInfo').value.trim();
+        if (!name) return;
+
+        const box = document.createElement('div');
+        box.className = 'note-entry';
+        box.innerHTML = `<h3>${name}</h3><p>${info}</p>`;
+
+        document.getElementById('pcContainer').appendChild(box);
+
+        document.getElementById('pcName').value = '';
+        document.getElementById('pcInfo').value = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => renderPages());
+</script>
+
+</body>
+</html>
